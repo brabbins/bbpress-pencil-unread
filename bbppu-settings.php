@@ -1,47 +1,49 @@
 <?php
 class bbP_Pencil_Unread_Settings {
-    
+
     static $menu_slug = 'bbppu';
-    
+
     var $menu_page;
 
 	function __construct() {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
         add_action( 'admin_init', array( $this, 'settings_init' ) );
 
-        
+
 	}
 
     function create_admin_menu(){
 
-        $menu_page = add_options_page( 
+        $menu_page = add_options_page(
             __( 'bbPress Pencil Unread', 'bbppu' ), //page title - I never understood why this parameter is needed for.  Put what you like ?
             __( 'bbPress Pencil Unread', 'bbppu' ), //menu title
             'manage_options', //cappability
             self::$menu_slug,
             array($this,'settings_page') //this function will output the content of the 'Music' page.
         );
-        
-        
+
+
 
     }
 
-    function settings_sanitize( $input ){
+    function settings_sanitize( $input ) {
+
         $new_input = array();
 
-        if( isset( $input['reset_options'] ) ){
-            
+        if ( isset( $input['reset_options'] ) ) {
+
             $new_input = bbppu()->options_default;
-            
-        }else{ //sanitize values
+
+        } else { //sanitize values
 
             //test registration time
             $new_input['forums_marks'] = ( isset($input['forums_marks']) ) ? 'on' : 'off';
             $new_input['test_registration_time'] = ( isset($input['test_registration_time']) ) ? 'on' : 'off';
             $new_input['bookmarks'] = ( isset($input['bookmarks']) ) ? 'on' : 'off';
-    
+            $new_input['fontawesome'] = ( isset($input['fontawesome']) ) ? 'on' : 'off';
+
         }
-        
+
         //remove default values
         foreach((array)$input as $slug => $value){
             $default = bbppu()->get_default_option($slug);
@@ -51,8 +53,8 @@ class bbP_Pencil_Unread_Settings {
         //$new_input = array_filter($new_input); //disabled here because this will remove '0' values
 
         return $new_input;
-        
-        
+
+
     }
 
     function settings_init(){
@@ -62,7 +64,7 @@ class bbP_Pencil_Unread_Settings {
             bbppu()->options_metaname, // Option name
             array( $this, 'settings_sanitize' ) // Sanitize
          );
-        
+
         add_settings_section(
             'settings_general', // ID
             __('General','bbppu'), // Title
@@ -71,31 +73,37 @@ class bbP_Pencil_Unread_Settings {
         );
 
         add_settings_field(
-            'marks', 
-            __('Enable forums marks','bbppu'), 
-            array( $this, 'enable_forums_marks_callback' ), 
+            'marks',
+            __('Enable forums marks','bbppu'),
+            array( $this, 'enable_forums_marks_callback' ),
             'bbppu-settings-page', // Page
             'settings_general'//section
         );
 
         add_settings_field(
-            'test_registration_time', 
-            __('Registration date check','bbppu'), 
-            array( $this, 'test_registration_time_callback' ), 
+            'test_registration_time',
+            __('Registration date check','bbppu'),
+            array( $this, 'test_registration_time_callback' ),
             'bbppu-settings-page', // Page
             'settings_general'//section
         );
-   
-        add_settings_field(
-            'bookmarks', 
-            __('Enable bookmarks','bbppu'), 
-            array( $this, 'enable_bookmark_callback' ), 
-            'bbppu-settings-page', // Page
-            'settings_general'//section
-        );
-        
 
-        
+        add_settings_field(
+            'bookmarks',
+            __('Enable bookmarks','bbppu'),
+            array( $this, 'enable_bookmark_callback' ),
+            'bbppu-settings-page', // Page
+            'settings_general'//section
+        );
+
+        add_settings_field(
+						'fontawesome',
+						__( 'Disable Font Awesome?','bbppu' ),
+						array( $this, 'bbppu_disable_font_awesome_callback' ),
+						'bbppu-settings-page', // Page
+						'settings_general'//section
+				);
+
         add_settings_section(
             'settings_system', // ID
             __('System','bbppu'), // Title
@@ -104,22 +112,22 @@ class bbP_Pencil_Unread_Settings {
         );
 
         add_settings_field(
-            'reset_options', 
-            __('Reset Options','bbppu'), 
-            array( $this, 'reset_options_callback' ), 
+            'reset_options',
+            __('Reset Options','bbppu'),
+            array( $this, 'reset_options_callback' ),
             'bbppu-settings-page', // Page
             'settings_system'//section
         );
 
     }
-    
+
     function bbppu_settings_general_desc(){
-        
+
     }
-    
+
     function enable_forums_marks_callback(){
         $option = bbppu()->get_options('forums_marks');
-        
+
         printf(
             '<input type="checkbox" name="%s[forums_marks]" value="on" %s /> %s',
             bbppu()->options_metaname,
@@ -127,10 +135,10 @@ class bbP_Pencil_Unread_Settings {
             __("Display a 'Mark as read' link in forums that marks all their topics","bbppu")
         );
     }
-    
+
     function test_registration_time_callback(){
         $option = bbppu()->get_options('test_registration_time');
-        
+
         printf(
             '<input type="checkbox" name="%s[test_registration_time]" value="on" %s /> %s',
             bbppu()->options_metaname,
@@ -138,10 +146,10 @@ class bbP_Pencil_Unread_Settings {
             __("Items older than the registration date of the user should be marked as read.","bbppu")
         );
     }
-    
+
     function enable_bookmark_callback(){
         $option = bbppu()->get_options('bookmarks');
-        
+
         printf(
             '<input type="checkbox" name="%s[bookmarks]" value="on" %s /> %s',
             bbppu()->options_metaname,
@@ -151,9 +159,9 @@ class bbP_Pencil_Unread_Settings {
     }
 
     function bbppu_settings_system_desc(){
-        
+
     }
-    
+
     function reset_options_callback(){
         printf(
             '<input type="checkbox" name="%1$s[reset_options]" value="on"/> %2$s',
@@ -162,12 +170,32 @@ class bbP_Pencil_Unread_Settings {
         );
     }
 
+    /**
+		 * Callback for disable font awesome plugin setting option
+		 *
+		 * @since 1.3.0
+		 *
+		 * array $options  site options
+		 */
+
+		function bbppu_disable_font_awesome_callback() {
+
+			$option = bbppu()->get_options( 'fontawesome' );
+
+			printf(
+				'<input type="checkbox" name="%s[fontawesome]" value="on" %s /> %s',
+				bbppu()->options_metaname,
+				checked( $option, 'on', false ),
+				sprintf( __( 'Disable Font Awesome CSS import call.', 'bbppu' ) )
+			);
+
+		} // bbppu_disable_font_awesome_callback() //
 
 	function  settings_page() {
         ?>
         <div class="wrap">
-            <h2><?php _e('bbPress Pencil Unread Settings','bbppu');?></h2>  
-            
+            <h2><?php _e('bbPress Pencil Unread Settings','bbppu');?></h2>
+
             <div>
                 <?php
                 $rate_link_wp = 'https://wordpress.org/support/view/plugin-reviews/bbpress-pencil-unread?rate#postform';
@@ -183,7 +211,7 @@ class bbP_Pencil_Unread_Settings {
                 <?php
 
                 // This prints out all hidden setting fields
-                settings_fields( 'bbppu_option_group' );   
+                settings_fields( 'bbppu_option_group' );
                 do_settings_sections( 'bbppu-settings-page' );
                 submit_button();
 
