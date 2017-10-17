@@ -1,7 +1,6 @@
 {
     "name": "gordielachance/bbpress-pencil-unread",
     "description": "Display which bbPress forums/topics have already been read by the user.",
-    "version": "1.3.0",
     "type": "wp-plugin",
     "keywords": ["bbpress", "wordpress"],
     "homepage": "https://wordpress.org/plugins/bbpress-pencil-unread",
