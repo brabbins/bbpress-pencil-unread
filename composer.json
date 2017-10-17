@@ -1,0 +1,24 @@
+{
+    "name": "gordielachance/bbpress-pencil-unread",
+    "description": "Display which bbPress forums/topics have already been read by the user.",
+    "version": "1.3.0",
+    "type": "wp-plugin",
+    "keywords": ["quiz", "wordpress"],
+    "homepage": "https://wordpress.org/plugins/bbpress-pencil-unread",
+    "time": "2013-07-01",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Gordie Lachance",
+            "homepage": "https://profiles.wordpress.org/grosbouff/",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+    ],
+    "require": {
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+    }
+}
